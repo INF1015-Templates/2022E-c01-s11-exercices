@@ -1,0 +1,8 @@
+settings/files_to_update.txt
+settings/variables.txt
+
+README.md
+
+Exercises/main.cpp
+Exercises/utils/MyClass.cpp
+Exercises/utils/print.cpp
