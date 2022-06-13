@@ -107,6 +107,7 @@ void runRaiiExample() {
 		try {
 			cout << "---A---" << "\n";
 			unique_ptr<MyClass> foo = make_unique<MyClass>();
+			cout << "---A.1---" << "\n";
 			throw 42;
 			cout << "---B---" << "\n";
 		} catch (...) {
