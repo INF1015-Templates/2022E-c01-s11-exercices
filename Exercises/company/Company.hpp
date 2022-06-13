@@ -54,6 +54,9 @@ class Company : public QObject
     Q_OBJECT
 
 public:
+	static inline const int maxEmployees = 100'000;
+	static bool isValidName(const string& companyName);
+
 	// Constructors
 	/**
 	 * @brief Company Default constructor of the class

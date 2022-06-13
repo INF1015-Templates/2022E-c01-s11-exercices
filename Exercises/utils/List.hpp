@@ -121,15 +121,25 @@ private:
 
 struct ListError : public logic_error {
 	using logic_error::logic_error;
+	virtual void raise() const {
+		throw *this;
+	}
 };
 
 struct ForeignIteratorError : public ListError {
 	using ListError::ListError;
+	void raise() const override {
+		throw *this;
+	}
 };
 
 struct EmptyListError : public ListError {
 	using ListError::ListError;
+	void raise() const override {
+		throw *this;
+	}
 };
+
 
 
 // Une liste bidirectionnelle est une séquence de noeuds qui connaissent leur noeuds précédents et suivants.
@@ -185,6 +195,8 @@ public:
 		size_ = other.size_;
 		other.last_ = nullptr;
 		other.size_ = 0;
+
+		return *this;
 	}
 
 	List& operator=(initializer_list<value_type> elements) {

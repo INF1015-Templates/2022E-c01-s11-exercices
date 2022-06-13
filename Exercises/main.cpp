@@ -5,6 +5,7 @@
 #include <cassert>
 #include <fstream>
 #include <filesystem>
+#include <stdexcept>
 
 #include <QException>
 #include <QApplication>
@@ -15,6 +16,7 @@
 #include <utils/MyClass.hpp>
 
 using namespace std;
+using namespace utils;
 
 
 int runQtExample(int argc, char* argv[]) {
@@ -38,25 +40,37 @@ int runQtExample(int argc, char* argv[]) {
 
 	Application a(argc, argv);
 	view::CompanyWindow w;
+	w.createEmployee("Employee", "Mohamed Doyon", 42);
+	w.createEmployee("Employee", "Kevin Barrette", 69);
+	w.createEmployee("Secretary", "Alyson Nolin", 420);
+	w.createEmployee("Secretary", "Robert Thomas", 1337);
+	w.createEmployee("Manager", "David Ducharme", 0xDEAD, 10);
+	w.createEmployee("Manager", "Claude Hernandez", 0xBEEF, 15);
+
 	w.show();
 	return a.exec();
 }
 
-void runListExample() {
-	using namespace utils;
+List<int> parseFile(const string& filename, bool printListEachStep = true) {
+	// Ici, le but de l'exercice est de faire un programme qui construit une liste liée à partir de valeurs entières et de commandes dans un fichier.
+	// Les commandes sont "popf" et "popb" qui enlève le premier et le dernier élément de la liste, respectivement. Les valeurs et commandes sont séparées par des espaces.
+	// Par exemple, le fichier contenant "42 1337 69" fera la liste [42 1337 69]
+	// "42 1337 69 popf" donne [1337 69]
+	// "42 1337 69 popb" donne [42 1337]
+	// "42 1337 popb 69" donne [42 69]
 
 	static auto hasDataLeft = [] (istream& file) {
 		return not(file.eof() or ws(file).eof());
 	};
 
+	List<int> values;
+
 	try {
-		List<int> values;
-
-		filesystem::remove("values.txt");
-		ofstream("values.txt") << "1 42 69 popf 9000 popb popb popf popf henlo 42 0xBEEF 0xRAWR";
-
-		ifstream file("values.txt");
+		ifstream file(filename);
 		file.exceptions(ios::failbit);
+
+		if (printListEachStep)
+			cout << values << "\n";
 		while (hasDataLeft(file)) {
 			try {
 				string x;
@@ -72,7 +86,9 @@ void runListExample() {
 						cout << "Unrecognized value or command: " << x << "\n";
 					}
 				}
-				cout << values << "\n";
+				// On affiche la liste à chaque opération si demandé.
+				if (printListEachStep)
+					cout << values << "\n";
 			} catch (EmptyListError& e) {
 				cout << e.what() << "\n";
 			}
@@ -80,6 +96,8 @@ void runListExample() {
 	} catch (ios::failure& e) {
 		cout << e.what() << "\n" << e.code() << "\n";
 	}
+
+	return values;
 }
 
 void runRaiiExample() {
@@ -166,17 +184,64 @@ void runSimpleExceptExample() {
 	cout << "Ok I'm done" << "\n";
 }
 
+double fn1(double x, double y) {
+	if (x == y)
+		throw logic_error("Division by zero (x == y)");
+	if (isinf(x) or isinf(y))
+		throw system_error(error_code{}, "One argument is infinity");
+	if (isnan(x) or isnan(y))
+		throw "One argument is NaN"s;
+	return (x + y) / (x - y);
+}
+
+void fn2() {
+	static string msg = "Hello, world!";
+	
+	cout << msg << "\n";
+	msg += " Bonjour";
+}
 
 
 int main(int argc, char* argv[]) {
-	return runQtExample(argc, argv);
+	//while (true) {
+	//	cout << "Enter x, y: ";
+	//	double x, y;
+	//	cin >> x >> y;
+	//	try {
+	//		double result = fn1(x, y);
+	//		cout << "(x + y) / (x - y) = " << result << "\n";
+	//		break;
+	//	} catch (logic_error& e) {
+	//		cout << "Caught std::logic_error : " << e.what() << "\n";
+	//	} catch (system_error& e) {
+	//		cout << "Caught std::system_error : " << e.code() << ", " << e.what() << "\n";
+	//	} catch (exception& e) {
+	//		cout << "Unspecified exception : " << e.what() << "\n";
+	//	} catch (...) {
+	//		cout << "Unknown exception caught." << "\n";
+	//	}
+
+	//	auto&& [ok, result] = fn1(x, y);
+	//	if (ok) {
+	//		cout << "(x + y) / (x - y) = " << result << "\n";
+	//		break;
+	//	}
+	//	else 
+	//		cout << "Invalid result or arguments." << "\n";
+	//}
+
+	//return runQtExample(argc, argv);
 
 	//try {
-	//	runListExample();
+	//	filesystem::remove("values.txt");
+	//	ofstream("values.txt") << "1 42 69 popf 9000 popb popb popf popf henlo 42 0xBEEF 0xRAWR";
+	//	List<int> values = parseFile("values.txt", true);
+	//	cout << "Values: " << values << "\n";
 	//} catch (system_error& e) {
 	//	cout << e.what() << e.code();
 	//} catch (exception& e) {
 	//	cout << e.what();
+	//	throw e;
 	//} catch (...) {
 	//	cout << "Unrecognized exception caught" << "\n";
 	//}

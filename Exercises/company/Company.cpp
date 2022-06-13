@@ -41,6 +41,10 @@ using namespace std;
 
 namespace company {
 
+bool Company::isValidName(const string& companyName) {
+	return companyName.find('@') != string::npos;
+}
+
 Company::Company()
 	: name_("unknown"), president_(nullptr)
 {
